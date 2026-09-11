@@ -4,9 +4,6 @@
 #$ -l mem=60G
 #$ -pe smp 8
 #$ -N bowtie2_picoplex
-#$ -wd /home/skgtorl/Scratch
-#$ -o /home/skgtorl/Scratch/bowtie2_logs/output.log
-#$ -e /home/skgtorl/Scratch/bowtie2_logs/error.log
 
 set -euo pipefail
 
@@ -14,14 +11,16 @@ conda activate bowtie2
 
 THREADS=8
 
-BOWTIE2_PREFIX="/home/skgtorl/Scratch/ref_genome/human_GRCh38_no_alt_analysis_set"
-FASTA="/home/skgtorl/Scratch/ref_genome/human_GRCh38_no_alt_analysis_set.fasta"
+PROJECT_DIR="/path/to/project"
+REFERENCE_DIR="/path/to/reference"
 
-INPUT_BASE="/home/skgtorl/Scratch/Picoplex_gold/Picoplex_gold_trimmed"
-OUTPUT_BASE="/home/skgtorl/Scratch/Picoplex_gold/bowtie2_trimmed_HEADCROP15_hg38_no_alt"
-LOG_DIR="/home/skgtorl/Scratch/bowtie2_logs"
+BOWTIE2_PREFIX="${REFERENCE_DIR}/human_GRCh38_no_alt_analysis_set"
+FASTA="${REFERENCE_DIR}/human_GRCh38_no_alt_analysis_set.fasta"
 
-mkdir -p "$OUTPUT_BASE" "$LOG_DIR"
+INPUT_BASE="${PROJECT_DIR}/trimmed_fastq"
+OUTPUT_BASE="${PROJECT_DIR}/bowtie2_hg38_no_alt"
+
+mkdir -p "$OUTPUT_BASE"
 
 unset HTS_BLOCK_SIZE || true
 
@@ -117,12 +116,6 @@ if [[ -n "${TMPDIR:-}" && -d "$TMPDIR" ]]; then
 else
     BOWTIE2_PREFIX_LOCAL="$BOWTIE2_PREFIX"
 fi
-
-echo "[$(timestamp)] Software versions:"
-bowtie2 --version | head -n 1
-samtools --version | head -n 1
-
-echo "[$(timestamp)] Starting alignment."
 
 find "$INPUT_BASE" \
     -type f \
